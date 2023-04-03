@@ -171,8 +171,15 @@ def create_sets(s1, s2, s3):
     c1, c2, c3, current_cycle = 0, 0, 0, 0    #c1 iterates over s1, c2 over s2, c3 over s3
     cycles = []
     while c1 < n and c2 < n and c3 < n:
-        first_index = min(c1, c2, c3)   #first index to be synthesized
+        if s1[c1] != s2[c2] and s1[c1] != s3[c3] and s2[c2] != s3[c3]:
+            if c1 in lcs1:
+                if c2 in lcs2:
+                    cycles.append(set(s1[c1]) | set(s2[c2]) | set(s3[c3]))
+                    while len(cycles[current_cycle]) == 1:
+                        cycles[current_cycle].add(random.choice(['A', 'C', 'G', 'T']))
+                    c1 += 1
 
+        first_index = min(c1, c2, c3)   #first index to be synthesized
         if first_index == c1:
             if s2[c2] == s1[c1] or s3[c3] == s1[c1]:
                 cycles.append(set(s1[c1]) | set(s2[c2]) | set(s3[c3]))
@@ -245,7 +252,6 @@ def create_sets(s1, s2, s3):
                     c3 += 1
                     current_cycle += 1
                     continue
-    if (c1 !=)
 
 
 
@@ -280,5 +286,8 @@ if __name__ == '__main__':
     first_letters = [key[0] for key in x.keys()]
     l1 = int(first_letters[0])
     l2 = int(first_letters[1])
-    print(l1)
-    print(l2)
+    lcs_indices = [value for value in x.values()]
+    lcs1 = lcs_indices[0]
+    lcs2 = lcs_indices[1]
+    print(lcs1)
+    print(lcs2)
