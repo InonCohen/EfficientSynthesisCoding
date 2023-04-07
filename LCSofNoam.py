@@ -1,13 +1,14 @@
 import random
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 # for the sake of code clarity, there is not a real need in python to use a swap function
-def swap(a, b): 
+def swap(a, b):
     return b, a
 
 
-def early_lcs_with_indexes(s1, s2):     #returns the lcs with the lowest indexes, and its indexes
+def lcs_with_low_indexes(s1, s2):  # returns the lcs with the lowest indexes, and its indexes
     m, n = len(s1), len(s2)
     dp = [[('', (-1, -1)) for _ in range(n + 1)] for _ in range(m + 1)]
     for i in range(1, m + 1):
@@ -33,7 +34,7 @@ def early_lcs_with_indexes(s1, s2):     #returns the lcs with the lowest indexes
     return lcs, idx1, idx2
 
 
-def late_lcs(str1, str2):           #returns the lcs with the highest indexes, and its indexes
+def high_indexes_lcs(str1, str2):  # returns the lcs with the highest indexes, and its indexes
     m = len(str1)
     n = len(str2)
     # Initialize an (m+1)x(n+1) matrix of zeros
@@ -61,7 +62,7 @@ def late_lcs(str1, str2):           #returns the lcs with the highest indexes, a
     return lcs_string
 
 
-def indexes_of_lcs(str1, str2):   #returns indexes of lcs, probably greatest indexes // todo: what on earth is that?
+def indexes_of_high_indexes_lcs(str1, str2):  # returns indexes of lcs, probably greatest indexes // todo: what on earth is that?
     m = len(str1)
     n = len(str2)
     # Initialize an (m+1)x(n+1) matrix of zeros
@@ -93,11 +94,12 @@ def indexes_of_lcs(str1, str2):   #returns indexes of lcs, probably greatest ind
     return s1_indexes, s2_indexes
 
 
-def leading_indexes1(str1, str2, str3):   # maps strings to lcs indexes# (greatest indexes) //todo: again, what does that mean?
+def leading_indexes1(str1, str2,
+                     str3):  # maps strings to lcs indexes# (greatest indexes) //todo: again, what does that mean?
     # Compute indexes of LCS of every pair
-    lcs_dict = {'1in12': (indexes_of_lcs(str1, str2))[0], '2in12': (indexes_of_lcs(str1, str2))[1],
-                '1in13': (indexes_of_lcs(str1, str3))[0], '3in13': (indexes_of_lcs(str1, str3))[1],
-                '2in23': (indexes_of_lcs(str2, str3))[0], '3in23': (indexes_of_lcs(str2, str3))[1]}
+    lcs_dict = {'1in12': (indexes_of_high_indexes_lcs(str1, str2))[0], '2in12': (indexes_of_high_indexes_lcs(str1, str2))[1],
+                '1in13': (indexes_of_high_indexes_lcs(str1, str3))[0], '3in13': (indexes_of_high_indexes_lcs(str1, str3))[1],
+                '2in23': (indexes_of_high_indexes_lcs(str2, str3))[0], '3in23': (indexes_of_high_indexes_lcs(str2, str3))[1]}
     # create a dictionary to store the number of indexes for each string's LCS
     indexes_count = {
         '1in12': len(lcs_dict['1in12']),
@@ -125,11 +127,11 @@ def leading_indexes1(str1, str2, str3):   # maps strings to lcs indexes# (greate
 def leading_indexes2(str1, str2, str3):  # maps strings to lcs indexes (smallest indexes)
     lcs_dict = {}
     # Compute indexes of LCS of str1 and str2
-    lcs12, lcs_dict['1in12'], lcs_dict['2in12'] = early_lcs_with_indexes(str1, str2)
+    lcs12, lcs_dict['1in12'], lcs_dict['2in12'] = lcs_with_low_indexes(str1, str2)
     # Compute indexes of LCS of str1 and str3
-    lcs13, lcs_dict['1in13'], lcs_dict['3in13'] = early_lcs_with_indexes(str1, str3)
+    lcs13, lcs_dict['1in13'], lcs_dict['3in13'] = lcs_with_low_indexes(str1, str3)
     # Compute indexes of LCS of str2 and str3
-    lcs23, lcs_dict['2in23'], lcs_dict['3in23'] = early_lcs_with_indexes(str2, str3)
+    lcs23, lcs_dict['2in23'], lcs_dict['3in23'] = lcs_with_low_indexes(str2, str3)
     # create a dictionary to store the number of indexes for each string's LCS
     indexes_count = {
         '1in12': len(lcs_dict['1in12']),
@@ -184,6 +186,7 @@ def separate_strings(s1, s2, s3):
             a.append((s3[n - i - 1], chars[1]))
     return a
 
+
 def create_cycle_by_first_index(s1, s2, s3, c1, c2, c3, cycles, current_cycle, first_index):
     if s2[c2] == s1[c1] or s3[c3] == s1[c1]:
         cycles.append(set(s1[c1]) | set(s2[c2]) | set(s3[c3]))
@@ -208,7 +211,7 @@ def create_cycle_by_first_index(s1, s2, s3, c1, c2, c3, cycles, current_cycle, f
             return
 
 
-def create_sets(string1, string2, string3, instance):
+def create_synthesis_seq(string1, string2, string3, instance):
     x = 0
     if instance == 1:
         x = leading_indexes1(s1, s2, s3)
@@ -264,73 +267,47 @@ def create_sets(string1, string2, string3, instance):
         # in the current cycle there are three different letters, and if there are lcs letters, they're a pair
         first_index = min(c1, c2, c3)  # first index to be synthesized
         if first_index == c1:
-            if s2[c2] == s1[c1] or s3[c3] == s1[c1]:
-                cycles.append(set(s1[c1]) | set(s2[c2]) | set(s3[c3]))
+            second_index = min(c2, c3)
+            if second_index == c2:
+                cycles.append(set(s1[c1]) | set(s2[c2]))
                 c1 += 1
                 c2 += 1
-                c3 += 1
                 current_cycle += 1
                 continue
             else:
-                second_index = min(c2, c3)
-                if second_index == c2:
-                    cycles.append(set(s1[c1]) | set(s2[c2]))
-                    c1 += 1
-                    c2 += 1
-                    current_cycle += 1
-                    continue
-                else:
-                    cycles.append(set(s1[c1]) | set(s3[c3]))
-                    c1 += 1
-                    c3 += 1
-                    current_cycle += 1
-                    continue
+                cycles.append(set(s1[c1]) | set(s3[c3]))
+                c1 += 1
+                c3 += 1
+                current_cycle += 1
+                continue
         if first_index == c2:
-            if s1[c1] == s2[c2] or s3[c3] == s2[c2]:
-                cycles.append(set(s2[c2]) | set(s1[c1]) | set(s3[c3]))
+            second_index = min(c1, c3)
+            if second_index == c1:
+                cycles.append(set(s2[c2]) | set(s1[c1]))
+                c2 += 1
                 c1 += 1
+                current_cycle += 1
+                continue
+            else:
+                cycles.append(set(s2[c2]) | set(s3[c3]))
                 c2 += 1
                 c3 += 1
                 current_cycle += 1
                 continue
-            else:
-                second_index = min(c1, c3)
-                if second_index == c1:
-                    cycles.append(set(s2[c2]) | set(s1[c1]))
-                    c2 += 1
-                    c1 += 1
-                    current_cycle += 1
-                    continue
-                else:
-                    cycles.append(set(s2[c2]) | set(s3[c3]))
-                    c2 += 1
-                    c3 += 1
-                    current_cycle += 1
-                    continue
         if first_index == c3:
-            if s2[c2] == s3[c3] or s1[c1] == s3[c3]:
-                cycles.append(set(s3[c3]) | set(s2[c2]) | set(s1[c1]))
-                # if len(cycles[current_cycle]) == 1:
-                #     cycles[current_cycle].add(random.choice(['A', 'C', 'G', 'T']))
-                c1 += 1
-                c2 += 1
+            second_index = min(c2, c1)
+            if second_index == c2:
+                cycles.append(set(s3[c3]) | set(s2[c2]))
                 c3 += 1
+                c2 += 1
                 current_cycle += 1
                 continue
             else:
-                second_index = min(c2, c1)
-                if second_index == c2:
-                    cycles.append(set(s3[c3]) | set(s2[c2]))
-                    c3 += 1
-                    c2 += 1
-                    current_cycle += 1
-                    continue
-                else:
-                    cycles.append(set(s3[c3]) | set(s1[c1]))
-                    c1 += 1
-                    c3 += 1
-                    current_cycle += 1
-                    continue
+                cycles.append(set(s3[c3]) | set(s1[c1]))
+                c1 += 1
+                c3 += 1
+                current_cycle += 1
+                continue
     while c1 < n or c2 < n or c3 < n:
         cycles.append(set())
         if c1 < n:
@@ -347,11 +324,11 @@ def create_sets(string1, string2, string3, instance):
 
 
 def update_min_vars(arr2, c1, c2, c3):
-    if arr2[0] == c1-1:
+    if arr2[0] == c1 - 1:
         arr2[0] += 1
-    elif arr2[0] == c2-1:
+    elif arr2[0] == c2 - 1:
         arr2[0] += 1
-    elif arr2[0] == c3-1:
+    elif arr2[0] == c3 - 1:
         arr2[0] += 1
     if arr2[1] == c1 - 1:
         arr2[1] += 1
@@ -364,11 +341,10 @@ def update_min_vars(arr2, c1, c2, c3):
 
 def generate_strings():
     chars = ['A', 'C', 'G', 'T']
-    s1 = ''.join(random.choices(chars, k=10))
-    s2 = ''.join(random.choices(chars, k=10))
-    s3 = ''.join(random.choices(chars, k=10))
+    s1 = ''.join(random.choices(chars, k=100))
+    s2 = ''.join(random.choices(chars, k=100))
+    s3 = ''.join(random.choices(chars, k=100))
     return s1, s2, s3
-
 
 
 if __name__ == '__main__':
@@ -376,48 +352,87 @@ if __name__ == '__main__':
     # s2 = "TATGCTTTCC"
     # s3 = "CCTTTCCGCA"
     i = 0
-    late_counter_of_1 = 0
-    early_counter_of_2 = 0
+    counter1 = 0    # counter of x1_high
+    counter2 = 0    # counter of x2_low
     it_matters = 0
     doesnt_matter = 0
     number_of_cycles = 0
     worst_number_of_cycles = 0
-    number_of_worst = 0 # number of times worst number of cycles was received
-    # worst_number_of_cycles_type = 0 # 0 means doesnt matter, 1 means late is worse, 2 means early is worse
-    number_triplets = 100000
-    while i < number_triplets:
+    number_of_worst = 0  # number of times worst number of cycles was received
+    # worst_number_of_cycles_type = 0 # 0 means doesnt matter, 1 means high is worse, 2 means low is worse
+    number_of_triplets = 100
+    synthesis_times = {}  # dictionary to store the times of synthesis per set
+
+    while i < number_of_triplets:
         s1, s2, s3 = generate_strings()
         # print("iteration", i+1)
         # print(s1, s2, s3)
-        x1_late = create_sets(s1, s2, s3, 1)
-        x2_early = create_sets(s1, s2, s3, 2)
-        if len(x2_early) < len(x1_late):
-            number_of_cycles += len(x2_early)
-            early_counter_of_2 += 1
+        x1_high = create_synthesis_seq(s1, s2, s3, 1)
+        x2_low = create_synthesis_seq(s1, s2, s3, 2)
+        if len(x2_low) < len(x1_high):
+            number_of_cycles += len(x2_low)
+            counter2 += 1
             it_matters += 1
-        elif len(x2_early) > len(x1_late):
-            number_of_cycles += len(x1_late)
-            late_counter_of_1 += 1
+            if len(x2_low) in synthesis_times:
+                synthesis_times[len(x2_low)] += 1
+            else:
+                synthesis_times[len(x2_low)] = 1
+            if len(x2_low) > worst_number_of_cycles:
+                worst_number_of_cycles = len(x2_low)
+                worst_number_of_cycles_type = 2
+                number_of_worst = 1
+            elif len(x2_low) == worst_number_of_cycles:
+                number_of_worst += 1
+        elif len(x2_low) > len(x1_high):
+            number_of_cycles += len(x1_high)
+            counter1 += 1
             it_matters += 1
+            if len(x1_high) in synthesis_times:
+                synthesis_times[len(x1_high)] += 1
+            else:
+                synthesis_times[len(x1_high)] = 1
+            if len(x1_high) > worst_number_of_cycles:
+                worst_number_of_cycles = len(x1_high)
+                worst_number_of_cycles_type = 1
+                number_of_worst = 1
+            elif len(x1_high) == worst_number_of_cycles:
+                number_of_worst += 1
         else:
-            number_of_cycles += len(x1_late)
+            number_of_cycles += len(x1_high)
             doesnt_matter += 1
-        if len(x1_late) > worst_number_of_cycles:
-            worst_number_of_cycles = len(x1_late)
-            worst_number_of_cycles_type = 1
-            number_of_worst = 1
-        elif len(x2_early) > worst_number_of_cycles:
-            worst_number_of_cycles = len(x2_early)
-            worst_number_of_cycles_type = 2
-            number_of_worst = 1
-        elif len(x1_late) == worst_number_of_cycles or len(x2_early) == worst_number_of_cycles:
-            number_of_worst += 1
+            if len(x1_high) in synthesis_times:
+                synthesis_times[len(x1_high)] += 1
+            else:
+                synthesis_times[len(x1_high)] = 1
+            if len(x1_high) > worst_number_of_cycles:
+                worst_number_of_cycles = len(x1_high)
+                worst_number_of_cycles_type = 1
+                number_of_worst = 1
+            elif len(x1_high) == worst_number_of_cycles:
+                number_of_worst += 1
         i += 1
-    print("the average number of cycles is:", number_of_cycles/number_triplets)
+    print("the average number of cycles is:", number_of_cycles / number_of_triplets)
     print("the number of cycles it mattered:", it_matters)
-    print("early matters:", early_counter_of_2)
-    print("late matters:", late_counter_of_1)
+    print("low matters:", counter2)
+    print("high matters:", counter1)
     print("the number of cycles it didn't:", doesnt_matter)
     print("worst number of cycles:", worst_number_of_cycles)
     # print("its type:", worst_number_of_cycles_type)
     print("number of times worst number of cycles was received", number_of_worst)
+
+    # plot the histogram
+    plt.bar(synthesis_times.keys(), synthesis_times.values())
+    plt.xlabel('Length of set')
+    plt.ylabel('Number of sets')
+    plt.title('Distribution of set lengths')
+    plt.show()
+
+    # plot the number of generated strings
+    labels = ['Counter1', 'Counter2', "Doesn't matter"]
+    values = [counter1, counter2, doesnt_matter]
+    plt.figure(figsize=(6, 4))
+    plt.bar(labels, values)
+    plt.xlabel('String type')
+    plt.ylabel('Number of generated strings')
+    plt.title('Number of generated strings by type')
+    plt.show()
