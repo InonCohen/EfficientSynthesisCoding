@@ -423,12 +423,15 @@ def edit_distance(s1, s2):
                 dp[i][j] = 1 + min(dp[i][j-1], dp[i-1][j], dp[i-1][j-1])
     return dp[m][n]
 
+
 def plot_dict(dictionary):
     fig, ax = plt.subplots()
     ax.bar(dictionary.keys(), dictionary.values())
     ax.set_xlabel("Keys")
     ax.set_ylabel("Values")
     ax.set_title("Dictionary plot")
+    # save plot to a file
+    plt.savefig("DictionaryPlot.png")
     plt.show()
 
 
@@ -442,7 +445,7 @@ if __name__ == '__main__':
     worst_number_of_cycles = 0
     number_of_worst = 0  # number of times worst number of cycles was received
     # worst_number_of_cycles_type = 0 # 0 means doesnt matter, 1 means high is worse, 2 means low is worse
-    number_of_triplets = 100
+    number_of_triplets = 10000
     synthesis_times = {}  # dictionary to store the times of synthesis per set
     n = 100
     naive_avg = 0
@@ -621,7 +624,9 @@ if __name__ == '__main__':
     print("the average number of cycles, without minimizing with naive, is:", number_of_cycles / number_of_triplets)
     print("the final average number of cycle is:", sum(total_final_syn_time) / number_of_triplets)
     print("average edit distance of three where the naive is better: ", sum(worse_than_naive['edit_dist_of_all_three'])/len(worse_than_naive['edit_dist_of_all_three']))
+    print("average edit distance of three (in general): ", sum(data['edit_dist_of_all_three'])/len(data['edit_dist_of_all_three']))
     print("average edit distance of the LCS-couple where the naive is better: ", sum(worse_than_naive['edit_dist_of_the_lcs_couple'])/len(worse_than_naive['edit_dist_of_the_lcs_couple']))
+    print("average edit distance of the LCS-couple (in general ", sum(data['edit_dist_of_the_lcs_couple'])/len(data['edit_dist_of_the_lcs_couple']))
     print("average lcs-length: ", sum(data['lcs_length'])/len(data['lcs_length']))
     print("average lcs-length where the naive is better: ", sum(worse_than_naive['lcs_length'])/len(worse_than_naive['lcs_length']))
     print("average lcs-length of the worst synthesis-time sets: ", sum(worst_syn_time_sets['lcs_length']) / len(worst_syn_time_sets['lcs_length']))
@@ -630,7 +635,6 @@ if __name__ == '__main__':
     print("high matters:", counter1)
     print("the number of cycles it didn't:", doesnt_matter)
     print("worst number of cycles:", worst_number_of_cycles)
-    # print("its type:", worst_number_of_cycles_type)
     print("number of times worst number of cycles was received", number_of_worst)
     print("the average number of cycles by naive is:", naive_avg/number_of_triplets)
     print("the average difference between the upper bound and our syn time is:", sum(total_upper_bounds_difference) / len(total_upper_bounds_difference))
@@ -663,7 +667,8 @@ if __name__ == '__main__':
     plt.bar(synthesis_times.keys(), synthesis_times.values())
     plt.xlabel('Synthesis Times')
     plt.ylabel('Number of Triplets Synthesized')
-    plt.title('Distribution of set lengths')
+    plt.title('Distribution of Set Lengths')
+    plt.savefig("DistributionOfSetLengths.png")
     plt.show()
 
     #plot the differences(bound - Sythesis_time)  per synthesis time
@@ -676,7 +681,7 @@ if __name__ == '__main__':
     ax.set_xlabel('Difference Between Upper Bound and the Synthesis Time')
     ax.set_ylabel('Number of Triplets')
     ax.set_title('Difference Counts')
-    # Display the plot
+    plt.savefig("DifferenceCounts.png")
     plt.show()
 
     # plot the number of generated strings, by LCS index type
@@ -686,7 +691,8 @@ if __name__ == '__main__':
     plt.bar(labels, values)
     plt.xlabel('String type')
     plt.ylabel('Number of Generated Strings')
-    plt.title('Number of Generated Strings by LCS Indexing')
+    plt.title('Number of Generated Strings by LCS Index (high or low)')
+    plt.savefig("StringsByLCSIndexing.png")
     plt.show()
 
     # Create a defaultdict to count the number of occurrences of each point
@@ -702,8 +708,8 @@ if __name__ == '__main__':
     # reverse the order of the y-axis labels
     ax.set_yticklabels(reversed(ax.get_yticklabels()))
     plt.title('Synthesis Time and the LCS Length')
+    plt.savefig("SynTimeAndLCSLen.png")
     plt.show()
-    # counts = defaultdict(int)
 
     # create a pandas dataframe from the two lists
     df = pd.DataFrame({'Synthesis Time': data['syn_time'], 'Edit Distance': data['edit_dist_of_all_three']})
@@ -716,6 +722,7 @@ if __name__ == '__main__':
     # reverse the order of the y-axis labels
     ax.set_yticklabels(reversed(ax.get_yticklabels()))
     plt.title('Synthesis Time and the Edit Distance of the Three Strands')
+    plt.savefig("DifferenceCounts.png")
     plt.show()
 
     # create a pandas dataframe from the two lists
@@ -729,6 +736,7 @@ if __name__ == '__main__':
     # reverse the order of the y-axis labels
     ax.set_yticklabels(reversed(ax.get_yticklabels()))
     plt.title('Synthesis Time and the Edit Distance of the LCS couple')
+    plt.savefig("SynTimeAndEditDistOf3.png")
     plt.show()
 
 
@@ -743,6 +751,7 @@ if __name__ == '__main__':
     # reverse the order of the y-axis labels
     ax.set_yticklabels(reversed(ax.get_yticklabels()))
     plt.title('Synthesis Time and the Edit Distance\nof the non-LCS Strand with One of the LCS Strands')
+    plt.savefig("SynTimeAndEditDistOfLCSCouple.png")
     plt.show()
 
 
@@ -757,6 +766,7 @@ if __name__ == '__main__':
     # reverse the order of the y-axis labels
     ax.set_yticklabels(reversed(ax.get_yticklabels()))
     plt.title('Synthesis Time and the Edit Distance\nof the non-LCS Strand with the other LCS-Strand')
+    plt.savefig("SynTimeAndEditDist2.png")
     plt.show()
 
 
@@ -766,11 +776,11 @@ if __name__ == '__main__':
     ax.plot(data['naive_syn_time'], color='red', label='naive_syn_time')
     # Plot syn_time as a blue line
     ax.plot(data['syn_time'], color='blue', label='syn_time')
-    # Add a legend to the plot
-    ax.legend()
     differences = [naive_syn - syn for syn, naive_syn in zip(data['syn_time'], data['naive_syn_time'])]
     avg_diff = np.mean(differences)
     avg_percent_diff = avg_diff * n/100
+    # Add a legend to the plot
+    ax.legend()
     # Set the x and y axis labels and title
     ax.set_xlabel('Data Point Index')
     ax.set_ylabel('Synthesis Time')
@@ -779,30 +789,9 @@ if __name__ == '__main__':
     props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
     plt.text(0.05, 0.95, textstr, transform=plt.gca().transAxes, fontsize=12,
              verticalalignment='top', bbox=props)
+    plt.savefig("SynTime-oursVSnaive.png")
     # Display the plot
     plt.show()
-
-    # import matplotlib.pyplot as plt
-    #
-    # # two different length lists
-    # x = worse_than_naive['edit_dist_of_all_three']
-    # y1 = worse_than_naive['syn_time']
-    # y2 = worse_than_naive['naive_syn_time']
-    #
-    # # plot the line graph
-    # plt.scatter(x, y1, color='red', label='Ours')
-    #
-    # # plot the scatter graph
-    # plt.scatter(x, y2, color='blue', label='Naive')
-    #
-    # # add legend and labels
-    # plt.legend()
-    # plt.xlabel('Edit Distance')
-    # plt.ylabel('Synthesis Time')
-    # plt.title('Synthesis Time of the ')
-    # # show the plot
-    # plt.show()
-
 
     # Define your data
     edit_distance = data['edit_dist_of_all_three']
@@ -820,6 +809,7 @@ if __name__ == '__main__':
     ax.set_title('Synthesis Time vs. Three Strands Edit Distance')
     # Add a legend to the plot
     ax.legend()
+    plt.savefig("SynTimeVSEditDistOf3.png")
     # Show the plot
     plt.show()
 
@@ -838,6 +828,7 @@ if __name__ == '__main__':
     ax.set_title('Synthesis Time vs. Edit Distance of the LCS Couple')
     # Add a legend to the plot
     ax.legend()
+    plt.savefig("SynTimeVSEditDistOfLCSCouple.png")
     # Show the plot
     plt.show()
 
@@ -858,14 +849,15 @@ if __name__ == '__main__':
     ax.set_title('LCS of Three - Naive vs. LCS-Bound')
     # Add a legend to the plot
     ax.legend()
+    plt.savefig("LCSof3-oursVSnaive.png")
     # Show the plot
     plt.show()
 
     # Generate some sample data
     x1 = worse_than_naive['index']
-    y1 = worse_than_naive['naive_syn_time']
+    y1 = worse_than_naive['lcs_length']
     x2 = without_worse['index']
-    y2 = without_worse['syn_time']
+    y2 = without_worse['lcs_length']
     # Create a new figure and set its size
     fig, ax = plt.subplots(figsize=(8, 6))
     # Plot the first array as dots
@@ -878,6 +870,7 @@ if __name__ == '__main__':
     ax.set_title('LCS - Naive vs. LCS-Bound')
     # Add a legend to the plot
     ax.legend()
+    plt.savefig("LCSofCouple-oursVSnaive.png")
     # Show the plot
     plt.show()
 
@@ -898,6 +891,7 @@ if __name__ == '__main__':
     ax.set_title('Edit Distance of Three - Naive vs. LCS-Bound')
     # Add a legend to the plot
     ax.legend()
+    plt.savefig("EditDistof3-oursVSnaive.png")
     # Show the plot
     plt.show()
 
@@ -918,5 +912,6 @@ if __name__ == '__main__':
     ax.set_title('Edit Distance of The LCS Couple - Naive vs. LCS-Bound')
     # Add a legend to the plot
     ax.legend()
+    plt.savefig("EditDistofLCSCouple-oursVSnaive.png")
     # Show the plot
     plt.show()
