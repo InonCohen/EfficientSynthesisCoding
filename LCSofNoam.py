@@ -444,7 +444,7 @@ if __name__ == '__main__':
     # worst_number_of_cycles_type = 0 # 0 means doesnt matter, 1 means high is worse, 2 means low is worse
     number_of_triplets = 100
     synthesis_times = {}  # dictionary to store the times of synthesis per set
-    n = 10
+    n = 100
     naive_avg = 0
     edit_dist_of_triplet = {}
     # Create two lists to store the difference between synthesis_times and upper_bound
@@ -843,27 +843,80 @@ if __name__ == '__main__':
 
     # Generate some sample data
     x1 = worse_than_naive['index']
-    y1 = worse_than_naive['lcs_of_three']
+    y1 = [len(i) for i in worse_than_naive['lcs_of_three']]
     x2 = without_worse['index']
-    y2 = without_worse['lcs_of_three']
-
+    y2 = [len(i) for i in without_worse['lcs_of_three']]
     # Create a new figure and set its size
     fig, ax = plt.subplots(figsize=(8, 6))
-
     # Plot the first array as dots
-    ax.scatter(x1, y1, label='Dots', marker='o')
-
+    ax.scatter(x1, y1, label='Naive', marker='o')
     # Plot the second array as squares
-    ax.scatter(x2, y2, label='Squares', marker='s')
-
+    ax.scatter(x2, y2, label='LCS', marker='s')
     # Set the axis labels and title
-    ax.set_xlabel('X Label')
-    ax.set_ylabel('Y Label')
-    ax.set_title('Scatter Plot of Two Arrays')
-
+    ax.set_xlabel('Index')
+    ax.set_ylabel('LCS Length')
+    ax.set_title('LCS of Three - Naive vs. LCS-Bound')
     # Add a legend to the plot
     ax.legend()
-
     # Show the plot
     plt.show()
 
+    # Generate some sample data
+    x1 = worse_than_naive['index']
+    y1 = worse_than_naive['naive_syn_time']
+    x2 = without_worse['index']
+    y2 = without_worse['syn_time']
+    # Create a new figure and set its size
+    fig, ax = plt.subplots(figsize=(8, 6))
+    # Plot the first array as dots
+    ax.scatter(x1, y1, label='Naive', marker='o')
+    # Plot the second array as squares
+    ax.scatter(x2, y2, label='LCS', marker='s')
+    # Set the axis labels and title
+    ax.set_xlabel('Index')
+    ax.set_ylabel('LCS Length')
+    ax.set_title('LCS - Naive vs. LCS-Bound')
+    # Add a legend to the plot
+    ax.legend()
+    # Show the plot
+    plt.show()
+
+    # Generate some sample data
+    x1 = worse_than_naive['index']
+    y1 = worse_than_naive['edit_dist_of_all_three']
+    x2 = without_worse['index']
+    y2 = without_worse['edit_dist_of_all_three']
+    # Create a new figure and set its size
+    fig, ax = plt.subplots(figsize=(8, 6))
+    # Plot the first array as dots
+    ax.scatter(x1, y1, label='Naive', marker='o')
+    # Plot the second array as squares
+    ax.scatter(x2, y2, label='Edit Distance', marker='s')
+    # Set the axis labels and title
+    ax.set_xlabel('Index')
+    ax.set_ylabel('Levenshtein Distance')
+    ax.set_title('Edit Distance of Three - Naive vs. LCS-Bound')
+    # Add a legend to the plot
+    ax.legend()
+    # Show the plot
+    plt.show()
+
+    # Generate some sample data
+    x1 = worse_than_naive['index']
+    y1 = worse_than_naive['edit_dist_of_the_lcs_couple']
+    x2 = without_worse['index']
+    y2 = without_worse['edit_dist_of_the_lcs_couple']
+    # Create a new figure and set its size
+    fig, ax = plt.subplots(figsize=(8, 6))
+    # Plot the first array as dots
+    ax.scatter(x1, y1, label='Naive', marker='o')
+    # Plot the second array as squares
+    ax.scatter(x2, y2, label='Edit Distance', marker='s')
+    # Set the axis labels and title
+    ax.set_xlabel('Index')
+    ax.set_ylabel('Levenshtein Distance')
+    ax.set_title('Edit Distance of The LCS Couple - Naive vs. LCS-Bound')
+    # Add a legend to the plot
+    ax.legend()
+    # Show the plot
+    plt.show()
