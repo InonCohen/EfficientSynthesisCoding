@@ -305,6 +305,40 @@ def GetCycles1(s1, s2, s3): # returns the number of cycles needed when addressin
         print(cycles)
 
 
+def lcs_three(s1, s2, s3):
+    # Initialize the memoization table
+    m, n, l = len(s1), len(s2), len(s3)
+    dp = [[[0 for _ in range(l + 1)] for _ in range(n + 1)] for _ in range(m + 1)]
+
+    # Fill the memoization table
+    for i in range(1, m + 1):
+        for j in range(1, n + 1):
+            for k in range(1, l + 1):
+                if s1[i - 1] == s2[j - 1] == s3[k - 1]:
+                    dp[i][j][k] = dp[i - 1][j - 1][k - 1] + 1
+                else:
+                    dp[i][j][k] = max(dp[i - 1][j][k], dp[i][j - 1][k], dp[i][j][k - 1])
+
+    # Backtrack to find the LCS
+    i, j, k = m, n, l
+    lcs = ""
+    while i > 0 and j > 0 and k > 0:
+        if s1[i - 1] == s2[j - 1] == s3[k - 1]:
+            lcs = s1[i - 1] + lcs
+            i -= 1
+            j -= 1
+            k -= 1
+        elif dp[i - 1][j][k] >= dp[i][j][k] and dp[i - 1][j][k] >= dp[i][j - 1][k] and dp[i - 1][j][k] >= dp[i][j][
+            k - 1]:
+            i -= 1
+        elif dp[i][j - 1][k] >= dp[i][j][k] and dp[i][j - 1][k] >= dp[i - 1][j][k] and dp[i][j - 1][k] >= dp[i][j][
+            k - 1]:
+            j -= 1
+        elif dp[i][j][k - 1] >= dp[i][j][k] and dp[i][j][k - 1] >= dp[i][j - 1][k] and dp[i][j][k - 1] >= dp[i - 1][j][
+            k]:
+            k -= 1
+
+    return lcs
 
 
 def GetCycles2(s1, s2, s3): #returns the number of cylces needed when addressing the LCS of two
@@ -369,15 +403,14 @@ if __name__ == '__main__':
     # plt.show()
     # s1, s2, s3 = generate_random_strings(5)
     n = 5
-    s1 = "CCTAG"
-    s2 = "ATAAT"
-    s3 = "GAAGT"
-    real_scs = "GATAAGT"
-    print(s1)
-    print(s2)
-    print(s3)
-    print(real_scs)
-    GetCycles1(s1, s2, s3)
+    s1 = "GAGAGA"
+    s2 = "GGGGGG"
+    s3 = "GAGAGA"
+    print(lcs_three(s1, s2, s3))
+    # print(s2)
+    # print(s3)
+    # print(real_scs)
+    # GetCycles1(s1, s2, s3)
 
 
 

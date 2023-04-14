@@ -15,6 +15,42 @@ def swap(a, b):
     return b, a
 
 
+def lcs_three(s1, s2, s3):
+    # Initialize the memoization table
+    m, n, l = len(s1), len(s2), len(s3)
+    dp = [[[0 for _ in range(l + 1)] for _ in range(n + 1)] for _ in range(m + 1)]
+
+    # Fill the memoization table
+    for i in range(1, m + 1):
+        for j in range(1, n + 1):
+            for k in range(1, l + 1):
+                if s1[i - 1] == s2[j - 1] == s3[k - 1]:
+                    dp[i][j][k] = dp[i - 1][j - 1][k - 1] + 1
+                else:
+                    dp[i][j][k] = max(dp[i - 1][j][k], dp[i][j - 1][k], dp[i][j][k - 1])
+
+    # Backtrack to find the LCS
+    i, j, k = m, n, l
+    lcs = ""
+    while i > 0 and j > 0 and k > 0:
+        if s1[i - 1] == s2[j - 1] == s3[k - 1]:
+            lcs = s1[i - 1] + lcs
+            i -= 1
+            j -= 1
+            k -= 1
+        elif dp[i - 1][j][k] >= dp[i][j][k] and dp[i - 1][j][k] >= dp[i][j - 1][k] and dp[i - 1][j][k] >= dp[i][j][
+            k - 1]:
+            i -= 1
+        elif dp[i][j - 1][k] >= dp[i][j][k] and dp[i][j - 1][k] >= dp[i - 1][j][k] and dp[i][j - 1][k] >= dp[i][j][
+            k - 1]:
+            j -= 1
+        elif dp[i][j][k - 1] >= dp[i][j][k] and dp[i][j][k - 1] >= dp[i][j - 1][k] and dp[i][j][k - 1] >= dp[i - 1][j][
+            k]:
+            k -= 1
+
+    return lcs
+
+
 def lcs_with_low_indexes(s1, s2):  # returns the lcs with the lowest indexes, and its indexes
     m, n = len(s1), len(s2)
     dp = [[('', (-1, -1)) for _ in range(n + 1)] for _ in range(m + 1)]
@@ -424,7 +460,8 @@ if __name__ == '__main__':
         'edit_dist_of_the_lcs_couple': [],
         'edit_dist2': [],
         'edit_dist3': [],
-        'naive_syn_time': []
+        'naive_syn_time': [],
+        'lcs_of_three': []
     }
     worst_syn_time_sets = {
         'index': [],
@@ -440,7 +477,8 @@ if __name__ == '__main__':
         'edit_dist_of_the_lcs_couple': [],
         'edit_dist2': [],
         'edit_dist3': [],
-        'naive_syn_time': []
+        'naive_syn_time': [],
+        'lcs_of_three': []
     }
     worse_than_naive = {
         'index': [],
@@ -456,14 +494,16 @@ if __name__ == '__main__':
         'edit_dist_of_the_lcs_couple': [],
         'edit_dist2': [],
         'edit_dist3': [],
-        'naive_syn_time': []
+        'naive_syn_time': [],
+        'lcs_of_three': []
     }
-
+    without_worse = deepcopy(data)
     while triplet_counter < number_of_triplets:
         data['index'].append(triplet_counter)
         s1, s2, s3 = generate_strings(n)
         # print("iteration", i+1)
         data['edit_dist_of_all_three'].append(triple_edit_distance(s1, s2, s3))
+        data['lcs_of_three'].append(lcs_three(s1, s2, s3))
         s1_1, s2_1, s3_1, x1_high, lcs_len1, lcs_1 = create_synthesis_seq(s1, s2, s3, 1)
         s1_2, s2_2, s3_2, x2_low, lcs_len2, lcs_2 = create_synthesis_seq(s1, s2, s3, 2)
         if lcs_len1 < lcs_len2:
@@ -561,6 +601,11 @@ if __name__ == '__main__':
             for lable_in_data in data.keys():
                 worse_than_naive[lable_in_data].append(data[lable_in_data][triplet_counter])
         triplet_counter += 1
+
+    for i in range(number_of_triplets):
+        if i not in worse_than_naive['index']:
+            for lbl in data.keys():
+                without_worse[lbl].append(data[lbl][i])
 
     total_final_syn_time = []
     total_upper_bounds_difference = []
@@ -778,8 +823,6 @@ if __name__ == '__main__':
     # Show the plot
     plt.show()
 
-
-    # Define your data
     edit_distance = data['edit_dist_of_the_lcs_couple']
     upper_bound = data['upper_bound']
     synthesis_time = total_final_syn_time
@@ -797,3 +840,30 @@ if __name__ == '__main__':
     ax.legend()
     # Show the plot
     plt.show()
+
+    # Generate some sample data
+    x1 = worse_than_naive['index']
+    y1 = worse_than_naive['lcs_of_three']
+    x2 = without_worse['index']
+    y2 = without_worse['lcs_of_three']
+
+    # Create a new figure and set its size
+    fig, ax = plt.subplots(figsize=(8, 6))
+
+    # Plot the first array as dots
+    ax.scatter(x1, y1, label='Dots', marker='o')
+
+    # Plot the second array as squares
+    ax.scatter(x2, y2, label='Squares', marker='s')
+
+    # Set the axis labels and title
+    ax.set_xlabel('X Label')
+    ax.set_ylabel('Y Label')
+    ax.set_title('Scatter Plot of Two Arrays')
+
+    # Add a legend to the plot
+    ax.legend()
+
+    # Show the plot
+    plt.show()
+
